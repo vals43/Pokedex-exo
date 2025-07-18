@@ -1,28 +1,9 @@
-const pokemonTypesColors = {
-    normal: 'bg-gray-400',
-    fire: 'bg-red-500',
-    water: 'bg-blue-500',
-    electric: 'bg-yellow-400',
-    grass: 'bg-green-500',
-    ice: 'bg-cyan-300',
-    fighting: 'bg-orange-600',
-    poison: 'bg-purple-500',
-    ground: 'bg-yellow-600',
-    flying: 'bg-sky-400',
-    psychic: 'bg-pink-500',
-    bug: 'bg-lime-500',
-    rock: 'bg-stone-500',
-    ghost: 'bg-indigo-500',
-    dragon: 'bg-violet-600',
-    dark: 'bg-gray-800',
-    steel: 'bg-gray-500',
-    fairy: 'bg-pink-300'
-  };
+import { pokemonTypesColors } from '../const.js';
 
-export default function Card({ img, id, name, types }) {
+export default function Card({ img, id, name, types, onClick }) {
 
   return (
-    <div className={`bg-white shadow-xl hover:scale-110 transition-transform w-48 h-64 p-3 rounded-2xl border-4 cursor-pointer`}>
+    <div className={`bg-white shadow-xl hover:scale-110 transition-transform w-48 h-64 p-3 rounded-2xl border-4 cursor-pointer`} onClick={onClick}>
       <div className="border-2 border-white w-full max-w-[144px] h-28 m-auto overflow-hidden flex items-center justify-center">
         <img
           className="w-full h-full object-contain"

@@ -33,6 +33,17 @@ export  async function getPokemonData(maxId = 1010) {
               }
               const data = await response.json();
               const types = data.types.map(typeObj => typeObj.type.name);
+              let flavorText = 'Aucune description disponible';
+                const speciesResponse = await fetch(`https://pokedex.mimo.dev/api/pokemon-species/${id}`);
+                if (speciesResponse.ok) {
+                  const speciesData = await speciesResponse.json();
+                  const flavorEntry = speciesData.flavor_text_entries.find(
+                    entry => entry.language.name === 'fr' && entry.version.name === 'sword'
+                  ) || speciesData.flavor_text_entries.find(
+                    entry => entry.language.name === 'fr'
+                  );
+                  flavorText = flavorEntry ? flavorEntry.flavor_text.replace(/\n/g, ' ') : flavorText;
+                }
               return {
                 id,
                 name: data.name,
@@ -40,7 +51,8 @@ export  async function getPokemonData(maxId = 1010) {
                 weight: data.weight,
                 img: data.sprites.other['official-artwork'].front_default,
                 abilities: data.abilities.filter(a => !a.is_hidden).map(a => a.ability.name),
-                types
+                types,
+                text: flavorText
                 
               };
             }  catch (error) {
@@ -84,7 +96,7 @@ export  async function getPokemonData(maxId = 1010) {
     }
   }
   
-  async function getPokemonEvolutions(maxId = 1010) {
+export  async function getPokemonEvolutions(maxId = 1010) {
     try {
       const pokemonIds = await getPokemonId(maxId);
       if (!pokemonIds.length) {
@@ -130,6 +142,25 @@ export  async function getPokemonData(maxId = 1010) {
       throw new Error(`Erreur lors de la récupération des évolutions: ${error.message}`);
     }
   }
-
+ export const pokemonTypesColors = {
+    normal: 'bg-gray-400',
+    fire: 'bg-red-500',
+    water: 'bg-blue-500',
+    electric: 'bg-yellow-400',
+    grass: 'bg-green-500',
+    ice: 'bg-cyan-300',
+    fighting: 'bg-orange-600',
+    poison: 'bg-purple-500',
+    ground: 'bg-yellow-600',
+    flying: 'bg-sky-400',
+    psychic: 'bg-pink-500',
+    bug: 'bg-lime-500',
+    rock: 'bg-stone-500',
+    ghost: 'bg-indigo-500',
+    dragon: 'bg-violet-600',
+    dark: 'bg-gray-800',
+    steel: 'bg-gray-500',
+    fairy: 'bg-pink-300'
+  };
 
   

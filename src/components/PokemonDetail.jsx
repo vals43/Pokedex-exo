@@ -1,4 +1,4 @@
-import { pokemonTypesColors } from './const';
+import { pokemonTypesColors } from '../const.js';
 
 export default function PokemonDetails({ pokemon, onClose }) {
   return (
@@ -34,16 +34,19 @@ export default function PokemonDetails({ pokemon, onClose }) {
             <span className="text-white text-sm px-3 py-1 rounded-full bg-gray-400">N/A</span>
           )}
         </div>
-        <div className="mt-4 text-center">
-          <p className="text-gray-700">Taille: {pokemon.height ? `${pokemon.height / 10} m` : 'N/A'}</p>
-          <p className="text-gray-700">Poids: {pokemon.weight ? `${pokemon.weight / 10} kg` : 'N/A'}</p>
+        <div className="mt-4 text-center flex justify-around">
+          <p className="text-gray-700">Taille: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.height ? `${pokemon.height / 10} m` : 'N/A'}</span></p>
+          <p className="text-gray-700">Poids: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.weight ? `${pokemon.weight / 10} kg` : 'N/A'}</span></p>
           <p className="text-gray-700">
-            Capacités: {pokemon.abilities && pokemon.abilities.length > 0 ? pokemon.abilities.join(', ') : 'N/A'}
+            Capacités: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.abilities && pokemon.abilities.length > 0 ? pokemon.abilities.join(', ') : 'N/A'}</span>
           </p>
+          </div>
           <p className="text-gray-700">
             Évolutions: {pokemon.evolutions && pokemon.evolutions.length > 0 ? pokemon.evolutions.join(' → ') : 'N/A'}
           </p>
-        </div>
+          <p className="text-gray-600 text-sm mt-2 line-clamp-2">
+            {pokemon.flavor_text || 'Aucune description disponible'}
+          </p>
       </div>
     </div>
   );
