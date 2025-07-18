@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Card from './Card.jsx';
 import { getPokemonData } from '../const.js';
+import Loader from './Loading.jsx';
 
 export default function Body() {
   const [pokemonData, setPokemonData] = useState([]);
@@ -32,7 +33,7 @@ export default function Body() {
             />
           ))
         ) : (
-          <p className="text-center text-gray-500">Chargement des Pokémon...</p>
+          <p className="text-center text-gray-500"><Loader/></p>
         )}
       </div>
     </div>

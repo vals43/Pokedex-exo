@@ -31,7 +31,7 @@ export default function Card({ img, id, name, types }) {
           loading="lazy"
         />
       </div>
-      <p className="flex justify-center text-slate-500 text-xl">{id}</p>
+      <p className="flex justify-center text-slate-500 text-xl">#{id}</p>
       <p className="text-2xl flex justify-center">{name}</p>
       <div className="flex justify-center gap-2 mt-2">
         {types && types.length > 0 ? (
