@@ -5,7 +5,7 @@ import './css/index.css'
 function App() {
 
   return(
-    <div className="bg-red-500">
+    <div className="bg-red-500 min-h-screen w-full">
       <Navbar/>
       <Body/>
     </div>

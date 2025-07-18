@@ -22,7 +22,7 @@ const pokemonTypesColors = {
 export default function Card({ img, id, name, types }) {
 
   return (
-    <div className={`bg-white shadow-xl hover:scale-110 transition-transform w-48 h-64 p-3 rounded-2xl`}>
+    <div className={`bg-white shadow-xl hover:scale-110 transition-transform w-48 h-64 p-3 rounded-2xl border-4`}>
       <div className="border-2 border-white w-full max-w-[144px] h-28 m-auto overflow-hidden flex items-center justify-center">
         <img
           className="w-full h-full object-contain"

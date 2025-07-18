@@ -33,8 +33,17 @@ export  async function getPokemonData(maxId = 1010) {
               }
               const data = await response.json();
               const types = data.types.map(typeObj => typeObj.type.name);
-              return { id,name: data.name, height: data.height ,img: data.sprites.front_default ,abilities: data.abilities.filter(a => !a.is_hidden).map(a => a.ability.name), weight: data.weight, types };
-            } catch (error) {
+              return {
+                id,
+                name: data.name,
+                height: data.height,
+                weight: data.weight,
+                img: data.sprites.other['official-artwork'].front_default,
+                abilities: data.abilities.filter(a => !a.is_hidden).map(a => a.ability.name),
+                types
+                
+              };
+            }  catch (error) {
               return { id,name:null, height: null , weight: null,img: null,abilities: null, types: [], error: error.message };
             }
           });
