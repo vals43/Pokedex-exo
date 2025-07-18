@@ -15,7 +15,7 @@
     }
   }
   
-  async function getPokemonData(maxId = 1010) {
+export  async function getPokemonData(maxId = 1010) {
     try {
       const pokemonIds = await getPokemonId(maxId);
   
@@ -121,12 +121,6 @@
       throw new Error(`Erreur lors de la récupération des évolutions: ${error.message}`);
     }
   }
-  
-  
-export const pokemonId = await getPokemonId();
-export const pokemonData = await getPokemonData();
-export const pokemonEvolutions = await getPokemonEvolutions(151);
-
 
 
   
