@@ -12,7 +12,7 @@ export default function Card({ img, id, name, types, onClick }) {
           loading="lazy"
         />
       </div>
-      <p className="flex justify-center text-slate-500 text-xl">#{id}</p>
+      <p className="flex justify-center text-slate-500 text-xl">#{id.padStart(4,0)}</p>
       <p className="text-2xl flex justify-center">{name}</p>
       <div className="flex justify-center gap-2 mt-2">
         {types && types.length > 0 ? (
