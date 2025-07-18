@@ -25,7 +25,7 @@ export default function PokemonDetails({ pokemon, onClose }) {
             pokemon.types.map(type => (
               <span
                 key={type}
-                className={`text-white text-sm px-3 py-1 rounded-full ${pokemonTypesColors[type] || 'bg-gray-400'}`}
+                className={`text-white text-xl px-3 py-1 rounded-xl ${pokemonTypesColors[type] || 'bg-gray-400'}`}
               >
                 {type}
               </span>
@@ -35,17 +35,17 @@ export default function PokemonDetails({ pokemon, onClose }) {
           )}
         </div>
         <div className="mt-4 text-center flex justify-around">
-          <p className="text-gray-700">Taille: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.height ? `${pokemon.height / 10} m` : 'N/A'}</span></p>
-          <p className="text-gray-700">Poids: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.weight ? `${pokemon.weight / 10} kg` : 'N/A'}</span></p>
+          <p className="text-gray-700">Height: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.height ? `${pokemon.height / 10} m` : 'N/A'}</span></p>
+          <p className="text-gray-700">Weight: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.weight ? `${pokemon.weight / 10} kg` : 'N/A'}</span></p>
           <p className="text-gray-700">
-            Capacités: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.abilities && pokemon.abilities.length > 0 ? pokemon.abilities.join(', ') : 'N/A'}</span>
+            Capacity: <span className='bg-gray-300 font-bold p-1 px-3 rounded-xl'>{pokemon.abilities && pokemon.abilities.length > 0 ? pokemon.abilities.join(', ') : 'N/A'}</span>
           </p>
           </div>
-          <p className="text-gray-700">
-            Évolutions: {pokemon.evolutions && pokemon.evolutions.length > 0 ? pokemon.evolutions.join(' → ') : 'N/A'}
+          <p className="text-gray-700 flex justify-center p-5">
+            Evolution: {pokemon.evolutions && pokemon.evolutions.length > 0 ? pokemon.evolutions.join(' → ') : 'N/A'}
           </p>
-          <p className="text-gray-600 text-sm mt-2 line-clamp-2">
-            {pokemon.flavor_text || 'Aucune description disponible'}
+          <p className="text-gray-600 mt-2 text-center text-xl">
+            {pokemon.text || 'Aucune description disponible'}
           </p>
       </div>
     </div>

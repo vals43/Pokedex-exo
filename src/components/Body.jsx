@@ -11,10 +11,8 @@ export default function Body() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Récupérer les données de base
-        const data = await getPokemonData(151); // Limité à 151 pour la vitesse
-        // Fusionner avec les évolutions
-        const evolutions = await getPokemonEvolutions(151);
+        const data = await getPokemonData(150); 
+        const evolutions = await getPokemonEvolutions(150);
         const combinedData = data.map((pokemon, index) => ({
           ...pokemon,
           evolutions: evolutions[index]?.evolutions || []

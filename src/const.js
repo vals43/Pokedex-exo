@@ -38,9 +38,9 @@ export  async function getPokemonData(maxId = 1010) {
                 if (speciesResponse.ok) {
                   const speciesData = await speciesResponse.json();
                   const flavorEntry = speciesData.flavor_text_entries.find(
-                    entry => entry.language.name === 'fr' && entry.version.name === 'sword'
+                    entry => entry.language.name === 'en' && entry.version.name === 'sword'
                   ) || speciesData.flavor_text_entries.find(
-                    entry => entry.language.name === 'fr'
+                    entry => entry.language.name === 'en'
                   );
                   flavorText = flavorEntry ? flavorEntry.flavor_text.replace(/\n/g, ' ') : flavorText;
                 }
@@ -53,7 +53,6 @@ export  async function getPokemonData(maxId = 1010) {
                 abilities: data.abilities.filter(a => !a.is_hidden).map(a => a.ability.name),
                 types,
                 text: flavorText
-                
               };
             }  catch (error) {
               return { id,name:null, height: null , weight: null,img: null,abilities: null, types: [], error: error.message };
@@ -142,6 +141,8 @@ export  async function getPokemonEvolutions(maxId = 1010) {
       throw new Error(`Erreur lors de la récupération des évolutions: ${error.message}`);
     }
   }
+  console.log(await getPokemonEvolutions());
+  
  export const pokemonTypesColors = {
     normal: 'bg-gray-400',
     fire: 'bg-red-500',
