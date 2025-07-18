@@ -5,6 +5,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}", // Scanne tous les fichiers JS, TS, JSX, TSX dans le dossier src et ses sous-dossiers
   ],
+  darkMode: 'class',
   theme: {
     extend: {},
   },
