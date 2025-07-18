@@ -8,7 +8,7 @@ export default function Navbar(){
                 <h1 className="text-3xl">Pokedex</h1>
             </div>
             <div className="flex gap-5 items-center">
-                    <input className="bg-slate-300 rounded-xl p-3 " type="text" name="" id="" placeholder="    name or number"/>
+                    <input className="bg-slate-300 rounded-xl p-3 " type="text" name="" id="" placeholder="name or number"/>
                     <Search/>
                     <Settings2/>
             </div>
