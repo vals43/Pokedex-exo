@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
+//bg-[#050816]
 const LoadingScreen = () => {
-  // Create the magic pattern symbol using SVG
   const magicPatternSymbol = <motion.svg width="120" height="120" viewBox="0 0 120 120" initial={{
     opacity: 0,
     scale: 0

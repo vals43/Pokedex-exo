@@ -3,12 +3,12 @@ import { pokemonTypesColors } from '../const.js';
 export default function Card({ img, id, name, types, onClick }) {
 
   return (
-    <div className={`bg-white shadow-xl hover:scale-110 transition-transform w-48 h-64 p-3 rounded-2xl border-4 cursor-pointer`} onClick={onClick}>
-      <div className="border-2 border-white w-full max-w-[144px] h-28 m-auto overflow-hidden flex items-center justify-center">
+    <div className={`bg-[#484C69] shadow-xl hover:scale-110 transition-transform w-48 h-64 p-3 rounded-2xl cursor-pointer`} onClick={onClick}>
+      <div className=" w-full max-w-[144px] h-28 m-auto overflow-hidden flex items-center justify-center">
         <img
           className="w-full h-full object-contain"
           src={img}
-          alt={`image de ${name}`}
+          alt={`image of ${name}`}
           loading="lazy"
         />
       </div>
