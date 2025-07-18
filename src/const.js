@@ -141,7 +141,6 @@ export  async function getPokemonEvolutions(maxId = 1010) {
       throw new Error(`Erreur lors de la récupération des évolutions: ${error.message}`);
     }
   }
-  console.log(await getPokemonEvolutions());
   
  export const pokemonTypesColors = {
     normal: 'bg-gray-400',

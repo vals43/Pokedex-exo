@@ -42,7 +42,7 @@ export default function Body() {
             />
           ))
         ) : (
-          <p className="text-center text-gray-500"> <Loader/></p>
+          <Loader/>
         )}
       </div>
       {selectedPokemon && (
