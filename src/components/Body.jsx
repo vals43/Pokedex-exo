@@ -45,8 +45,14 @@ export default function Body() {
           <Loader/>
         )}
       </div>
+      {/*mbola misy bug*/ }
       {selectedPokemon && (
-        <PokemonDetails pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
+         useEffect(() => {
+          const interval =  setTimeout(() => { 
+            <PokemonDetails pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
+           }, 500);
+           return () => clearTimeout(interval)
+         })
       )}
     </div>
   );
