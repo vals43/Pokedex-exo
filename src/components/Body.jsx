@@ -18,6 +18,7 @@ export default function Body() {
           evolutions: evolutions[index]?.evolutions || []
         }));
         setPokemonData(combinedData);
+        
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error.message);
       }
@@ -45,14 +46,8 @@ export default function Body() {
           <Loader/>
         )}
       </div>
-      {/*mbola misy bug*/ }
       {selectedPokemon && (
-         useEffect(() => {
-          const interval =  setTimeout(() => { 
             <PokemonDetails pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
-           }, 500);
-           return () => clearTimeout(interval)
-         })
       )}
     </div>
   );

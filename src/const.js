@@ -162,5 +162,6 @@ export  async function getPokemonEvolutions(maxId = 1010) {
     steel: 'bg-gray-500',
     fairy: 'bg-pink-300'
   };
+  
 
   

@@ -10,7 +10,7 @@ export default function Navbar(){
             </div>
             <div className="flex gap-5 items-center">
                     <DarkModeToggle/>
-                    <input className="bg-slate-900 text-white rounded-xl p-3 " type="text" name="" id="" placeholder="name or number"/>
+                    <input className="bg-slate-900 text-white rounded-xl p-3" type="text" name="" id="" placeholder="name or number"/>
                     <Search/>
                     <Settings2/>
             </div>

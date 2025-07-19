@@ -2,7 +2,7 @@ import { pokemonTypesColors } from '../const.js';
 
 export default function PokemonDetails({ pokemon, onClose }) {
   return (
-    <div className="fixed inset-0 text-white bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 text-white bg-black bg-opacity-50 flex items-center justify-center z-50 transition-all">
       <div className="bg-[#202531]  rounded-2xl p-6 w-full max-w-md sm:max-w-lg md:max-w-xl shadow-2xl relative">
         <button
           onClick={onClose}

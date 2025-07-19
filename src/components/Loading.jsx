@@ -29,7 +29,7 @@ const LoadingScreen = () => {
         strokeWidth="5"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
-        transition={{ duration: 2, delay: 0.5 }}
+        transition={{ duration: 0, delay: 0.5 }}
       />
       {/* Black equatorial band */}
       <motion.rect
@@ -50,9 +50,6 @@ const LoadingScreen = () => {
         fill="#FFFFFF"
         stroke="#000000"
         strokeWidth="2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 2 }}
       />
       {/* Central gray inner button */}
       <motion.circle
@@ -106,7 +103,7 @@ const LoadingScreen = () => {
           transition={{ delay: 0.7, duration: 2 }}
         />
       </div>
-      <style jsx>{`
+      <style>{`
         @keyframes floatParticle {
           0% {
             transform: translateY(0) translateX(0);
