@@ -19,6 +19,7 @@ export default function Body() {
         }));
         setPokemonData(combinedData);
         
+        
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error.message);
       }

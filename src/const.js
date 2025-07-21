@@ -1,21 +1,26 @@
 const POKEAPI_BASE = "https://pokeapi.co/api/v2";
+import {
+  Circle, Flame, Droplet, Zap, Leaf, Snowflake,
+  Crosshair, Skull, Globe, Wind, Brain, Bug,
+  Mountain, Ghost, Moon, Shield, Heart
+} from 'lucide-react';
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function getPokemonId(maxId = 1010) {
+export async function getPokemonId(maxId = 1300) {
   try {
     const response = await fetch(`${POKEAPI_BASE}/pokemon?limit=${maxId}`);
     if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
     const data = await response.json();
-    return data.results.map((_, index) => index + 1); // IDs 1 à maxId
+    return data.results.map((_, index) => index + 1);
   } catch (error) {
     throw new Error(`Erreur lors de la récupération des IDs: ${error.message}`);
   }
 }
 
-export async function getPokemonData(maxId = 1010) {
+export async function getPokemonData(maxId = 1300) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const results = [];
@@ -91,38 +96,53 @@ async function getEvolutionChain(url, cache = new Map()) {
   }
 }
 
-export async function getPokemonEvolutions(maxId = 1010) {
+export async function getPokemonEvolutions(maxId = 1300) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const results = [];
     const evolutionCache = new Map();
+    const imageCache = new Map();
     const batchSize = 50;
 
     for (let i = 0; i < pokemonIds.length; i += batchSize) {
       const batch = pokemonIds.slice(i, i + batchSize);
-      try {
-        await delay(50);
-        const batchResults = await Promise.all(
-          batch.map(async id => {
-            try {
-              const speciesRes = await fetch(`${POKEAPI_BASE}/pokemon-species/${id}`);
-              if (!speciesRes.ok) throw new Error(`Erreur HTTP species ${speciesRes.status}`);
-              const speciesData = await speciesRes.json();
+      await delay(50);
 
-              const evolutionUrl = speciesData.evolution_chain?.url;
-              if (!evolutionUrl) return { id, evolutions: [] };
+      const batchResults = await Promise.all(
+        batch.map(async id => {
+          try {
+            const speciesRes = await fetch(`${POKEAPI_BASE}/pokemon-species/${id}`);
+            if (!speciesRes.ok) throw new Error(`Erreur HTTP species ${speciesRes.status}`);
+            const speciesData = await speciesRes.json();
 
-              const evolutions = await getEvolutionChain(evolutionUrl, evolutionCache);
-              return { id, evolutions };
-            } catch (e) {
-              return { id, evolutions: [], error: e.message };
-            }
-          })
-        );
-        results.push(...batchResults);
-      } catch (error) {
-        console.warn(`Erreur dans le lot ${i / batchSize + 1}: ${error.message}`);
-      }
+            const evolutionUrl = speciesData.evolution_chain?.url;
+            if (!evolutionUrl) return { id, evolutions: [] };
+
+            const names = await getEvolutionChain(evolutionUrl, evolutionCache);
+
+            const evolutionsWithImages = await Promise.all(
+              names.map(async name => {
+                if (imageCache.has(name)) return imageCache.get(name);
+                const pokeRes = await fetch(`${POKEAPI_BASE}/pokemon/${name}`);
+                if (!pokeRes.ok) return { name, img: null };
+                const pokeData = await pokeRes.json();
+                const evoObj = {
+                  name,
+                  img: pokeData.sprites.other['official-artwork'].front_default
+                };
+                imageCache.set(name, evoObj);
+                return evoObj;
+              })
+            );
+
+            return { id, evolutions: evolutionsWithImages };
+          } catch (e) {
+            return { id, evolutions: [], error: e.message };
+          }
+        })
+      );
+
+      results.push(...batchResults);
     }
 
     return results;
@@ -130,6 +150,7 @@ export async function getPokemonEvolutions(maxId = 1010) {
     throw new Error(`Erreur récupération évolutions: ${error.message}`);
   }
 }
+
 export const pokemonTypeConfig = {
   normal: { color: 'bg-gray-400', border: 'border-gray-400', icon: 'Circle' },
   fire: { color: 'bg-red-500', border: 'border-red-500', icon: 'Flame' },
@@ -177,4 +198,24 @@ export const formatPokemonData = async (rawData) => {
     text: flavor?.flavor_text.replace(/\f/g, ' ') || 'No description found.',
     evolutions
   };
+};
+export const typeIcons = {
+  normal: Circle,
+  fire: Flame,
+  water: Droplet,
+  electric: Zap,
+  grass: Leaf,
+  ice: Snowflake,
+  fighting: Crosshair,
+  poison: Skull,
+  ground: Globe,
+  flying: Wind,
+  psychic: Brain,
+  bug: Bug,
+  rock: Mountain,
+  ghost: Ghost,
+  dragon: Wind,
+  dark: Moon,
+  steel: Shield,
+  fairy: Heart
 };

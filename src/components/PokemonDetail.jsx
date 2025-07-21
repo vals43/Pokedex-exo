@@ -1,90 +1,119 @@
-import { X } from 'lucide-react';
-import { pokemonTypeConfig } from '../const.js';
-import { Circle, Flame, Droplet, Zap, Leaf, Snowflake, Crosshair, Skull, Globe, Wind, Brain, Bug, Mountain, Ghost, Moon, Shield, Heart } from 'lucide-react';
-
-const typeIcons = {
-  normal: Circle,
-  fire: Flame,
-  water: Droplet,
-  electric: Zap,
-  grass: Leaf,
-  ice: Snowflake,
-  fighting: Crosshair,
-  poison: Skull,
-  ground: Globe,
-  flying: Wind,
-  psychic: Brain,
-  bug: Bug,
-  rock: Mountain,
-  ghost: Ghost,
-  dragon: Flame,
-  dark: Moon,
-  steel: Shield,
-  fairy: Heart
-};
+import { ArrowRight, X } from 'lucide-react';
+import { pokemonTypeConfig, typeIcons } from '../const.js';
 
 export default function PokemonDetails({ pokemon, onClose }) {
-  // Déterminer le type principal pour la bordure
-  const primaryType = pokemon.types && pokemon.types.length > 0 ? pokemon.types[0] : 'normal';
-  const borderColor = pokemonTypeConfig[primaryType]?.color.replace('bg-', 'border-') || 'border-gray-400';
+  if (!pokemon) return null;
+
+  const { id, name, img, height, weight, abilities, types, evolutions } = pokemon;
+  const primaryType = types?.[0] || 'normal';
+  const bgClass = pokemonTypeConfig[primaryType]?.color || 'bg-gray-500';
+
+  const glowColorHex = {
+    'bg-red-500': '#ef4444',
+    'bg-blue-500': '#3b82f6',
+    'bg-yellow-400': '#facc15',
+    'bg-green-500': '#22c55e',
+    'bg-cyan-300': '#67e8f9',
+    'bg-orange-600': '#ea580c',
+    'bg-purple-500': '#a855f7',
+    'bg-yellow-600': '#ca8a04',
+    'bg-sky-400': '#38bdf8',
+    'bg-pink-500': '#ec4899',
+    'bg-lime-500': '#84cc16',
+    'bg-stone-500': '#78716c',
+    'bg-indigo-500': '#6366f1',
+    'bg-violet-600': '#7c3aed',
+    'bg-gray-800': '#1f2937',
+    'bg-gray-500': '#6b7280',
+    'bg-pink-300': '#f9a8d4'
+  }[bgClass] || '#888';
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-all duration-300">
-      <div className={`bg-[#202531] ${borderColor} rounded-2xl p-4 w-full max-w-md sm:max-w-lg md:max-w-xl shadow-2xl relative`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div
+        className={`relative rounded-2xl p-6 w-[90%] max-w-md text-white shadow-xl border-4 ${pokemonTypeConfig[primaryType]?.border}`}
+        style={{
+          backgroundColor: '#111',
+          boxShadow: `0 0 20px ${glowColorHex}, 0 0 40px ${glowColorHex}55`
+        }}
+      >
+        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+          className="absolute top-3 right-3 p-1 rounded-full bg-white/10 hover:bg-white/20"
         >
-          <X />
+          <X className="text-white" />
         </button>
-        <div className="w-full max-w-[200px] h-48 m-auto overflow-hidden flex items-center justify-center">
-          <img
-            className="w-full h-full object-contain transition-all duration-300 hover:glow"
-            src={pokemon.img}
-            alt={`image of ${pokemon.name}`}
-            loading="lazy"
-          />
+
+        {/* Main Image */}
+        <div className="flex justify-center mb-4">
+          <div
+            className="rounded-full p-3"
+            style={{
+              backgroundColor: `${glowColorHex}22`,
+              boxShadow: `0 0 25px ${glowColorHex}`,
+              borderRadius: '50%'
+            }}
+          >
+            <img src={img} alt={name} className="w-32 h-32 object-contain" />
+          </div>
         </div>
-        <p className="flex justify-center text-xl mt-2 text-gray-300">#{pokemon.id.padStart(4, '0')}</p>
-        <p className="text-3xl flex justify-center capitalize font-bold text-white mt-1">{pokemon.name}</p>
-        <div className="flex justify-center gap-2 mt-2">
-          {pokemon.types && pokemon.types.length > 0 ? (
-            pokemon.types.map(type => {
-              const IconComponent = typeIcons[type] || Circle;
-              return (
-                <div
-                  key={type}
-                  className={`flex items-center gap-1 px-3 py-1 rounded-xl ${pokemonTypeConfig[type]?.color || 'bg-gray-400'} shadow-md`}
-                  style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)' }}
-                >
-                  <IconComponent className="w-8 h-8 text-white" />
-                  <span className="text-white text-xl">
-                    {type}
-                  </span>
+
+        {/* Info */}
+        <h2 className="text-2xl font-bold text-center capitalize mb-2">{name}</h2>
+        <p className="text-center text-white/70 mb-2">#{id.toString().padStart(4, '0')}</p>
+
+        <div className="flex justify-center gap-3 mb-4">
+          <div className="text-sm">Height: {(height / 10).toFixed(1)} m</div>
+          <div className="text-sm">Weight: {(weight / 10).toFixed(1)} kg</div>
+        </div>
+
+        {/* Types */}
+        <div className="flex justify-center gap-2 flex-wrap mb-4">
+          {types?.map(type => {
+            const Icon = typeIcons[type] || X;
+            return (
+              <div
+                key={type}
+                className={`flex items-center gap-1 px-3 py-1 rounded-lg ${pokemonTypeConfig[type]?.color || 'bg-gray-500'}`}
+              >
+                <Icon className="w-4 h-4 text-white" />
+                <span className="capitalize text-sm">{type}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Abilities */}
+        <div className="mb-4">
+          <h3 className="font-semibold mb-1">Abilities</h3>
+          <ul className="list-disc pl-5 text-sm">
+            {abilities?.map((ability, i) => (
+              <li key={i} className="capitalize">{ability}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Evolutions with Images */}
+        {evolutions?.length > 0 && (
+          <div className="mb-2">
+            <h3 className="font-semibold mb-2">Evolutions</h3>
+            <div className="flex flex-wrap justify-center gap-4">
+              {evolutions.map((evo, i) => (
+                <div key={i} className="flex flex-col items-center text-sm capitalize">
+                  <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={evo.img || 'https://via.placeholder.com/64?text=?'}
+                      alt={evo.name}
+                      className="object-contain w-full h-full"
+                    />
+                  </div>
+                  <span className="mt-1 text-white/80">{evo.name}</span>
                 </div>
-              );
-            })
-          ) : (
-            <span className="text-white text-sm px-3 py-1 rounded-xl bg-gray-400 shadow-md">N/A</span>
-          )}
-        </div>
-        <div className="flex flex-col md:flex-row mt-4">
-          <div className="w-full md:w-1/2 flex flex-col gap-y-3 pl-5">
-            <p className="text-gray-400">Height: <span className="bg-gray-700 font-bold p-1 px-3 rounded-xl text-white">{pokemon.height ? `${pokemon.height / 10} m` : 'N/A'}</span></p>
-            <p className="text-gray-400">Weight: <span className="bg-gray-700 font-bold p-1 px-3 rounded-xl text-white">{pokemon.weight ? `${pokemon.weight / 10} kg` : 'N/A'}</span></p>
-            <p className="text-gray-400">
-              Abilities: <span className="bg-gray-700 font-bold p-1 px-3 rounded-xl text-white flex w-fit">{pokemon.abilities && pokemon.abilities.length > 0 ? pokemon.abilities.join(' , ') : 'N/A'}</span>
-            </p>
+              ))}
+            </div>
           </div>
-          <div className="w-full md:w-1/2 pl-5 mt-4 md:mt-0">
-            <p className="text-gray-400 text-right text-lg mt-2">
-              {pokemon.text || 'Aucune description disponible'}
-            </p>
-          </div>
-        </div>
-        <p className="text-gray-400 flex justify-center mt-4 p-2">
-          Evolution: {pokemon.evolutions && pokemon.evolutions.length > 0 ? pokemon.evolutions.join(' → ') : 'N/A'}
-        </p>
+        )}
       </div>
     </div>
   );

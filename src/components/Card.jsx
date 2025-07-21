@@ -1,31 +1,9 @@
-import { pokemonTypeConfig } from '../const.js';
+import { pokemonTypeConfig , typeIcons} from '../const.js';
 import {
   Circle, Flame, Droplet, Zap, Leaf, Snowflake,
   Crosshair, Skull, Globe, Wind, Brain, Bug,
   Mountain, Ghost, Moon, Shield, Heart
 } from 'lucide-react';
-
-// Associe chaque type à une icône Lucide
-const typeIcons = {
-  normal: Circle,
-  fire: Flame,
-  water: Droplet,
-  electric: Zap,
-  grass: Leaf,
-  ice: Snowflake,
-  fighting: Crosshair,
-  poison: Skull,
-  ground: Globe,
-  flying: Wind,
-  psychic: Brain,
-  bug: Bug,
-  rock: Mountain,
-  ghost: Ghost,
-  dragon: Wind,
-  dark: Moon,
-  steel: Shield,
-  fairy: Heart
-};
 
 export default function Card({ img, id, name, types, weight, height, onClick }) {
   const primaryType = types?.[0] || 'normal';
@@ -33,7 +11,7 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
   const borderClass = pokemonTypeConfig[primaryType]?.border || 'border-gray-400';
   const bgClass = pokemonTypeConfig[primaryType]?.color || 'bg-gray-400';
 
-  // Glow color in hex for box-shadow
+
   const glowColorHexMap = {
     'bg-gray-400': '#9ca3af',
     'bg-red-500': '#ef4444',
@@ -61,7 +39,7 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
       className={`relative bg-black shadow-lg border-2 ${borderClass} rounded-2xl p-3 cursor-pointer transition-all duration-300 min-w-[180px] max-w-[240px] hover:scale-105`}
       onClick={onClick}
       style={{
-        boxShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}55`
+        boxShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}25`
       }}
     >
       {/* ID permanent */}
@@ -83,7 +61,6 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
             className="max-w-[120px] max-h-[120px] object-contain transition-all duration-300"
             src={img}
             alt={`image of ${name}`}
-            loading="lazy"
           />
         </div>
       </div>
