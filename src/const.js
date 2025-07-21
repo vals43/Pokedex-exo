@@ -9,7 +9,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function getPokemonId(maxId = 1300) {
+export async function getPokemonId(maxId = 5000) {
   try {
     const response = await fetch(`${POKEAPI_BASE}/pokemon?limit=${maxId}`);
     if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
@@ -20,7 +20,7 @@ export async function getPokemonId(maxId = 1300) {
   }
 }
 
-export async function getPokemonData(maxId = 1300) {
+export async function getPokemonData(maxId = 5000) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const results = [];
@@ -96,7 +96,7 @@ async function getEvolutionChain(url, cache = new Map()) {
   }
 }
 
-export async function getPokemonEvolutions(maxId = 1300) {
+export async function getPokemonEvolutions(maxId = 5000) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const results = [];

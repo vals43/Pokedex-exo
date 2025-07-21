@@ -1,19 +1,21 @@
-import { pokemonTypeConfig , typeIcons} from '../const.js';
+// src/components/Card.jsx
+import { pokemonTypeConfig, typeIcons } from '../const.js';
 import {
   Circle, Flame, Droplet, Zap, Leaf, Snowflake,
   Crosshair, Skull, Globe, Wind, Brain, Bug,
   Mountain, Ghost, Moon, Shield, Heart
 } from 'lucide-react';
+import { useContext } from 'react';
+import { ThemeContext } from './ThemeContext';
 
 export default function Card({ img, id, name, types, weight, height, onClick }) {
+  const { isDarkMode } = useContext(ThemeContext);
   const primaryType = types?.[0] || 'normal';
-
   const borderClass = pokemonTypeConfig[primaryType]?.border || 'border-gray-400';
   const bgClass = pokemonTypeConfig[primaryType]?.color || 'bg-gray-400';
 
-
   const glowColorHexMap = {
-    'bg-gray-400': '#9ca3af',
+    'bg-gray-400': isDarkMode ? '#9ca3af' : '#6b7280',
     'bg-red-500': '#ef4444',
     'bg-blue-500': '#3b82f6',
     'bg-yellow-400': '#facc15',
@@ -28,22 +30,30 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
     'bg-stone-500': '#78716c',
     'bg-indigo-500': '#6366f1',
     'bg-violet-600': '#7c3aed',
-    'bg-gray-800': '#1f2937',
-    'bg-gray-500': '#6b7280',
+    'bg-gray-800': isDarkMode ? '#1f2937' : '#d1d5db',
+    'bg-gray-500': isDarkMode ? '#6b7280' : '#9ca3af',
     'bg-pink-300': '#f9a8d4'
   };
-  const glowColor = glowColorHexMap[bgClass] || '#888';
+  const glowColor = glowColorHexMap[bgClass] || (isDarkMode ? '#888' : '#aaa');
 
   return (
     <div
-      className={`relative bg-black shadow-lg border-2 ${borderClass} rounded-2xl p-3 cursor-pointer transition-all duration-300 min-w-[180px] max-w-[240px] hover:scale-105`}
+      className={`
+        relative shadow-lg border-2 ${borderClass} rounded-2xl p-3 cursor-pointer transition-all duration-300 min-w-[180px] max-w-[240px] hover:scale-105
+        ${isDarkMode ? 'bg-black' : 'bg-white'}
+      `}
       onClick={onClick}
       style={{
         boxShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}25`
       }}
     >
       {/* ID permanent */}
-      <div className="absolute top-2 left-2 bg-black/70 text-white text-sm px-2 py-1 rounded-full z-10">
+      <div
+        className={`
+          absolute top-2 left-2 rounded-full z-10 text-sm px-2 py-1
+          ${isDarkMode ? 'bg-black/70 text-white' : 'bg-gray-200/70 text-gray-900'}
+        `}
+      >
         #{id?.toString().padStart(4, '0')}
       </div>
 
@@ -67,8 +77,20 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
 
       {/* Contenu texte */}
       <div className="text-center">
-        <p className="text-white text-lg font-bold mt-2 capitalize truncate">{name}</p>
-        <div className="text-white/70 text-sm mt-1">
+        <p
+          className={`
+            text-lg font-bold mt-2 capitalize truncate
+            ${isDarkMode ? 'text-white' : 'text-gray-900'}
+          `}
+        >
+          {name}
+        </p>
+        <div
+          className={`
+            text-sm mt-1
+            ${isDarkMode ? 'text-white/70' : 'text-gray-600'}
+          `}
+        >
           <p>Height: {height ? `${(height / 10).toFixed(1)} m` : 'N/A'}</p>
           <p>Weight: {weight ? `${(weight / 10).toFixed(1)} kg` : 'N/A'}</p>
         </div>
@@ -81,7 +103,9 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
               return (
                 <div
                   key={type}
-                  className={`flex items-center gap-1 px-3 py-1 rounded-lg ${pokemonTypeConfig[type]?.color || 'bg-gray-400'} shadow-md`}
+                  className={`
+                    flex items-center gap-1 px-3 py-1 rounded-lg ${pokemonTypeConfig[type]?.color || 'bg-gray-400'} shadow-md
+                  `}
                   style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)' }}
                 >
                   <Icon className="w-5 h-5 text-white" />
@@ -90,7 +114,14 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
               );
             })
           ) : (
-            <span className="text-white text-sm px-2 py-1 rounded-lg bg-gray-400 shadow-md">N/A</span>
+            <span
+              className={`
+                text-sm px-2 py-1 rounded-lg shadow-md
+                ${isDarkMode ? 'bg-gray-400 text-white' : 'bg-gray-200 text-gray-900'}
+              `}
+            >
+              N/A
+            </span>
           )}
         </div>
       </div>

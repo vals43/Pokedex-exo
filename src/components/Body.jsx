@@ -1,25 +1,26 @@
-import { useState, useEffect } from 'react';
+// src/components/Body.jsx
+import { useState, useEffect, useContext } from 'react';
 import Card from './Card.jsx';
 import PokemonDetails from './PokemonDetail.jsx';
 import { getPokemonData, getPokemonEvolutions } from '../const.js';
 import Loader from './Loading.jsx';
+import { ThemeContext } from './ThemeContext';
 
 export default function Body() {
+  const { isDarkMode } = useContext(ThemeContext);
   const [pokemonData, setPokemonData] = useState([]);
   const [selectedPokemon, setSelectedPokemon] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getPokemonData(150); 
+        const data = await getPokemonData(150);
         const evolutions = await getPokemonEvolutions(150);
         const combinedData = data.map((pokemon, index) => ({
           ...pokemon,
           evolutions: evolutions[index]?.evolutions || []
         }));
         setPokemonData(combinedData);
-        
-        
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error.message);
       }
@@ -28,7 +29,12 @@ export default function Body() {
   }, []);
 
   return (
-    <div className="p-16">
+    <div
+      className={`
+        p-16
+        ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}
+      `}
+    >
       <div className="flex flex-wrap justify-center gap-6">
         {pokemonData.length > 0 ? (
           pokemonData.map(pokemon => (
@@ -46,11 +52,11 @@ export default function Body() {
             />
           ))
         ) : (
-          <Loader/>
+          <Loader />
         )}
       </div>
       {selectedPokemon && (
-            <PokemonDetails pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
+        <PokemonDetails pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
       )}
     </div>
   );
