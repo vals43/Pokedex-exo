@@ -140,24 +140,23 @@ export async function getPokemonEvolutions(maxId = 1010) {
   }
 }
 
-// Configuration des types avec couleurs et icônes lucide-react
 export const pokemonTypeConfig = {
-  normal: { color: 'bg-gray-400', icon: 'Circle' },
-  fire: { color: 'bg-red-500', icon: 'Flame' },
-  water: { color: 'bg-blue-500', icon: 'Droplet' },
-  electric: { color: 'bg-yellow-400', icon: 'Zap' },
-  grass: { color: 'bg-green-500', icon: 'Leaf' },
-  ice: { color: 'bg-cyan-300', icon: 'Snowflake' },
-  fighting: { color: 'bg-orange-600', icon: 'Crosshair' },
-  poison: { color: 'bg-purple-500', icon: 'Skull' },
-  ground: { color: 'bg-yellow-600', icon: 'Globe' },
-  flying: { color: 'bg-sky-400', icon: 'Wind' },
-  psychic: { color: 'bg-pink-500', icon: 'Brain' },
-  bug: { color: 'bg-lime-500', icon: 'Bug' },
-  rock: { color: 'bg-stone-500', icon: 'Mountain' },
-  ghost: { color: 'bg-indigo-500', icon: 'Ghost' },
-  dragon: { color: 'bg-violet-600', icon: 'Dragon' },
-  dark: { color: 'bg-gray-800', icon: 'Moon' },
-  steel: { color: 'bg-gray-500', icon: 'Shield' },
-  fairy: { color: 'bg-pink-300', icon: 'Heart' }
+  normal: { color: 'bg-gray-400', border: 'border-gray-400', icon: 'Circle' },
+  fire: { color: 'bg-red-500', border: 'border-red-500', icon: 'Flame' },
+  water: { color: 'bg-blue-500', border: 'border-blue-500', icon: 'Droplet' },
+  electric: { color: 'bg-yellow-400', border: 'border-yellow-400', icon: 'Zap' },
+  grass: { color: 'bg-green-500', border: 'border-green-500', icon: 'Leaf' },
+  ice: { color: 'bg-cyan-300', border: 'border-cyan-300', icon: 'Snowflake' },
+  fighting: { color: 'bg-orange-600', border: 'border-orange-600', icon: 'Crosshair' },
+  poison: { color: 'bg-purple-500', border: 'border-purple-500', icon: 'Skull' },
+  ground: { color: 'bg-yellow-600', border: 'border-yellow-600', icon: 'Globe' },
+  flying: { color: 'bg-sky-400', border: 'border-sky-400', icon: 'Wind' },
+  psychic: { color: 'bg-pink-500', border: 'border-pink-500', icon: 'Brain' },
+  bug: { color: 'bg-lime-500', border: 'border-lime-500', icon: 'Bug' },
+  rock: { color: 'bg-stone-500', border: 'border-stone-500', icon: 'Mountain' },
+  ghost: { color: 'bg-indigo-500', border: 'border-indigo-500', icon: 'Ghost' },
+  dragon: { color: 'bg-violet-600', border: 'border-violet-600', icon: 'Dragon' },
+  dark: { color: 'bg-gray-800', border: 'border-gray-800', icon: 'Moon' },
+  steel: { color: 'bg-gray-500', border: 'border-gray-500', icon: 'Shield' },
+  fairy: { color: 'bg-pink-300', border: 'border-pink-300', icon: 'Heart' }
 };
