@@ -1,25 +1,31 @@
 import { useState } from "react";
 import { Menu, Search, Settings2, X } from "lucide-react";
 import DarkModeToggle from "./ToggleSwitch";
-
+import { formatPokemonData } from "../const.js";
+import logo from "../assets/logo Pokedex.png"
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = async () => {
-    if (!searchTerm.trim()) return;
-
+    if (!searchTerm) return;
+  
     try {
-      const response = await fetch(`https://pokedex.mimo.dev/pokemon/${searchTerm.toLowerCase()}`);
-      if (!response.ok) throw new Error("Pokémon not found");
-
-      const data = await response.json();
-      console.log("Pokémon trouvé :", data); // Tu peux afficher une carte ici
-
-    } catch (error) {
-      console.error("Erreur lors de la recherche :", error.message);
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`);
+      if (!res.ok) {
+        throw new Error("Pokémon non trouvé");
+      }
+      const rawData = await res.json();
+      const pokemon = await formatPokemonData(rawData);
+  
+      console.log(pokemon);
+    } catch (err) {
+      console.error("Erreur :", err);
     }
   };
+  
+  
+  
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSearch();
@@ -29,13 +35,14 @@ export default function Navbar() {
     <>
       <nav className="bg-[#0a0a23] sticky top-0 z-50 px-4 py-4 md:px-16 text-white flex items-center justify-between">
         <div className="flex items-center justify-between w-full md:w-auto">
-          <h1 className="text-2xl font-bold">Pokedex</h1>
+          <h1 className="text-2xl font-bold">
+            <img src={logo} className="h-16" alt="" />
+          </h1>
           <button onClick={() => setIsMenuOpen(true)} className="md:hidden">
             <Menu size={28} />
           </button>
         </div>
 
-        {/* Desktop */}
         <div className="hidden md:flex gap-5 items-center">
           <DarkModeToggle />
           <input
@@ -51,7 +58,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Drawer */}
       <aside
         className={`fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-[#003366] to-[#001933] text-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out
         ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
