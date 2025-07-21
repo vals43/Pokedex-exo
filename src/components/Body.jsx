@@ -37,6 +37,8 @@ export default function Body() {
               id={pokemon.id}
               name={pokemon.name}
               types={pokemon.types}
+              height={pokemon.height}
+              weight={pokemon.weight}
               abilities={pokemon.abilities}
               evolutions={pokemon.evolutions}
               onClick={() => setSelectedPokemon(pokemon)}

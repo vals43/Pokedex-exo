@@ -3,12 +3,12 @@ import DarkModeToggle from "./ToggleSwitch";
 
 export default function Navbar(){
     return (
-        <nav className="bg-[#002] p-6 px-16  text-white flex justify-between">
-            <div className="gap-3 flex items-center">
-                <Menu className="size-10"/>
+        <nav className="bg-[#002] sticky top-0 z-50 p-6 px-16 text-white flex justify-between">
+            <div className="flex items-center justify-between    ">
                 <h1 className="text-3xl">Pokedex</h1>
+                <Menu className="size-10 hidden max-md:flex"/>
             </div>
-            <div className="flex gap-5 items-center">
+            <div className="flex gap-5 items-center max-md:hidden">
                     <DarkModeToggle/>
                     <input className="bg-slate-900 text-white rounded-xl p-3" type="text" name="" id="" placeholder="name or number"/>
                     <Search/>

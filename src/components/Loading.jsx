@@ -16,7 +16,7 @@ const LoadingScreen = () => {
         d="M 20 60 A 40 40 0 0 1 100 60"
         fill="#FF0000"
         stroke="#000000"
-        strokeWidth="5"
+        strokeWidth="3"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
         transition={{ duration: 2, delay: 0.5 }}
@@ -26,7 +26,7 @@ const LoadingScreen = () => {
         d="M 20 60 A 40 40 0 0 0 100 60"
         fill="#FFFFFF"
         stroke="#000000"
-        strokeWidth="5"
+        strokeWidth="3"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
         transition={{ duration: 0, delay: 0.5 }}
@@ -97,7 +97,7 @@ const LoadingScreen = () => {
           Chargement du Pokedex
         </motion.h2>
         <motion.div
-          className="mt-4 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full"
+          className="mt-4 h-1 bg-gradient-to-r from-red-100 to-red-900 rounded-full"
           initial={{ width: 0 }}
           animate={{ width: 200 }}
           transition={{ delay: 0.7, duration: 2 }}
