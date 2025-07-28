@@ -1,8 +1,7 @@
-// src/components/Body.jsx
 import { useState, useEffect, useContext } from 'react';
 import Card from './Card.jsx';
 import PokemonDetails from './PokemonDetail.jsx';
-import { getPokemonData, getPokemonEvolutions } from '../const.js';
+import { getPokemonData, getPokemonEvolutions, getPokemonSpecialStatus } from '../const.js';
 import Loader from './Loading.jsx';
 import { ThemeContext } from './ThemeContext';
 
@@ -14,11 +13,19 @@ export default function Body() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getPokemonData(150);
-        const evolutions = await getPokemonEvolutions(150);
+        const [data, evolutions, specialStatuses] = await Promise.all([
+          getPokemonData(150),
+          getPokemonEvolutions(150),
+          getPokemonSpecialStatus(150)
+        ]);
+
         const combinedData = data.map((pokemon, index) => ({
           ...pokemon,
-          evolutions: evolutions[index]?.evolutions || []
+          evolutions: evolutions[index]?.evolutions || [],
+          isLegendary: specialStatuses[index]?.isLegendary || false,
+          isMythical: specialStatuses[index]?.isMythical || false,
+          isBaby: specialStatuses[index]?.isBaby || false,
+          generation: specialStatuses[index]?.generation || 'unknown'
         }));
         setPokemonData(combinedData);
       } catch (error) {
@@ -27,6 +34,15 @@ export default function Body() {
     }
     fetchData();
   }, []);
+
+  const handleShowPokemon = (evo) => {
+    const matchingPokemon = pokemonData.find(p => p.name === evo.name);
+    if (matchingPokemon) {
+      setSelectedPokemon(matchingPokemon);
+    } else {
+      console.warn(`Evolution ${evo.name} not found in pokemonData`);
+    }
+  };
 
   return (
     <div
@@ -48,7 +64,13 @@ export default function Body() {
               weight={pokemon.weight}
               abilities={pokemon.abilities}
               evolutions={pokemon.evolutions}
-              onClick={() => setSelectedPokemon(pokemon)}
+              isLegendary={pokemon.isLegendary}
+              isMythical={pokemon.isMythical}
+              isBaby={pokemon.isBaby}
+              onClick={() => {
+                console.log('Selected Pokémon:', pokemon);
+                setSelectedPokemon(pokemon);
+              }}
             />
           ))
         ) : (
@@ -56,7 +78,11 @@ export default function Body() {
         )}
       </div>
       {selectedPokemon && (
-        <PokemonDetails pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
+        <PokemonDetails
+          pokemon={selectedPokemon}
+          onClose={() => setSelectedPokemon(null)}
+          onShowPokemon={handleShowPokemon}
+        />
       )}
     </div>
   );

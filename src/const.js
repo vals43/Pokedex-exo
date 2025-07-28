@@ -86,6 +86,7 @@ export async function getPokemonData(maxId = 5000) {
           );
 
           const pokemonStats = statsData.find(s => s.id === id)?.stats || [];
+          const text = flavorEntry?.flavor_text?.replace(/\n|\f/g, ' ') || 'No description available';
 
           return {
             id,
@@ -95,7 +96,7 @@ export async function getPokemonData(maxId = 5000) {
             img: data.sprites.other['official-artwork'].front_default,
             abilities: data.abilities.filter(a => !a.is_hidden).map(a => a.ability.name),
             types: data.types.map(t => t.type.name),
-            text: flavorEntry?.flavor_text?.replace(/\n|\f/g, ' ') || 'No description available',
+            text,
             stats: pokemonStats
           };
         } catch (error) {
@@ -255,3 +256,43 @@ export const typeIcons = {
   steel: Shield,
   fairy: Heart
 };
+
+export async function getPokemonSpecialStatus(maxId = 5000) {
+  try {
+    const pokemonIds = await getPokemonId(maxId);
+    const results = [];
+    const batchSize = 50;
+
+    for (let i = 0; i < pokemonIds.length; i += batchSize) {
+      const batch = pokemonIds.slice(i, i + batchSize);
+      await delay(50);
+
+      const batchPromises = batch.map(async id => {
+        try {
+          const response = await fetch(`${POKEAPI_BASE}/pokemon-species/${id}`);
+          if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
+          const data = await response.json();
+
+          return {
+            id,
+            name: data.name,
+            isLegendary: data.is_legendary || false,
+            isMythical: data.is_mythical || false,
+            isBaby: data.is_baby || false,
+            generation: data.generation?.name || 'unknown'
+          };
+        } catch (error) {
+          console.warn(`Erreur pour le Pokémon ${id}: ${error.message}`);
+          return { id, isLegendary: false, isMythical: false, isBaby: false, generation: 'unknown', error: error.message };
+        }
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
+    }
+
+    return results;
+  } catch (error) {
+    throw new Error(`Erreur lors de la récupération des statuts spéciaux: ${error.message}`);
+  }
+}

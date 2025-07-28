@@ -14,7 +14,6 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
   const bgClass = pokemonTypeConfig[primaryType]?.color || 'bg-gray-400';
   const borderClass = pokemonTypeConfig[primaryType]?.border || 'border-gray-400';
 
-  // Consistent glowColorHexMap with Card.jsx
   const glowColorHexMap = {
     'bg-gray-400': isDarkMode ? '#9ca3af' : '#6b7280',
     'bg-red-500': '#ef4444',
@@ -40,7 +39,7 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
   const subText = isDarkMode ? 'text-white/70' : 'text-gray-600';
 
   const tabContent = {
-    stats: stats && (
+    stats: stats?.length > 0 ? (
       <motion.div
         className="space-y-2 sm:space-y-3"
         initial={{ x: 100, opacity: 0 }}
@@ -50,34 +49,45 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
       >
         {stats.map((stat, i) => (
           <div key={i} className="flex items-center gap-2 sm:gap-3">
-            <span className={`w-20 sm:w-24 text-xs text-white  sm:text-sm capitalize ${subText}`}>
+            <span className={`w-20 sm:w-24 text-xs sm:text-sm capitalize ${subText}`}>
               {stat.name}
             </span>
-            <div className="flex-1 h-2 sm:h-3 text-white bg-gray-300 rounded-full overflow-hidden">
+            <div className="flex-1 h-2 sm:h-3 bg-gray-300 rounded-full overflow-hidden">
               <div
                 className={`h-full ${bgClass}`}
-                style={{ width: `${(stat.base_stat / 255) * 100}%` }}
+                style={{ width: `${Math.min((stat.base_stat / 255) * 100, 100)}%` }}
               />
             </div>
-            <span className={`text-xs text-white sm:text-sm ${subText}`}>
+            <span className={`text-xs sm:text-sm ${subText}`}>
               {stat.base_stat}
             </span>
           </div>
         ))}
       </motion.div>
+    ) : (
+      <motion.div
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -100, opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="text-sm sm:text-base text-center text-gray-500"
+      >
+        No stats available.
+      </motion.div>
     ),
     description: (
       <motion.div
-        className="text-sm sm:text-base leading-relaxed whitespace-pre-line"
+        className="text-sm sm:text-base text-white leading-relaxed whitespace-pre-line"
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -100, opacity: 0 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         {text || 'No description available.'}
+        
       </motion.div>
     ),
-    evolutions: evolutions?.length > 0 && (
+    evolutions: evolutions?.length > 0 ? (
       <motion.div
         className="flex gap-3 sm:gap-4 overflow-x-auto pb-2"
         initial={{ x: 100, opacity: 0 }}
@@ -106,6 +116,16 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
           </div>
         ))}
       </motion.div>
+    ) : (
+      <motion.div
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -100, opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="text-sm sm:text-base text-center text-gray-500"
+      >
+        No evolutions available.
+      </motion.div>
     ),
   };
 
@@ -128,7 +148,6 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
         `}
         style={{ boxShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}25` }}
       >
-        {/* Close Button */}
         <button
           onClick={onClose}
           className={`
@@ -141,9 +160,7 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
           <X size={20} />
         </button>
 
-        {/* Main Content */}
         <div className="flex flex-col md:flex-row md:gap-6">
-          {/* Left Section: Image, Name, ID, Types */}
           <div className="flex flex-col items-center w-full md:w-1/2">
             <div
               className="p-3 sm:p-4 rounded-full"
@@ -188,9 +205,7 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
             </div>
           </div>
 
-          {/* Right Section: Details */}
           <div className="w-full md:w-1/2 flex flex-col">
-            {/* Basic Info */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div>
                 <p className={`text-sm font-semibold ${subText}`}>Height</p>
@@ -206,7 +221,6 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
               </div>
             </div>
 
-            {/* Abilities */}
             <div className="mb-4 sm:mb-6">
               <h3 className={`text-base sm:text-lg font-semibold mb-2 ${textColor}`}>
                 Abilities
@@ -226,7 +240,6 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
               </div>
             </div>
 
-            {/* Tabs */}
             <div className="mb-4 sm:mb-6">
               <div className="flex gap-2 sm:gap-3 border-b border-gray-300 dark:border-gray-600">
                 {['stats', 'description', 'evolutions'].map((tab) => (
@@ -256,7 +269,7 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
                       transition={{ duration: 0.3, ease: 'easeInOut' }}
                       className="text-sm sm:text-base text-center text-gray-500"
                     >
-                      No content available.
+                      {text}
                     </motion.div>
                   )}
                 </AnimatePresence>

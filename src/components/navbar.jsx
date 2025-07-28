@@ -4,6 +4,7 @@ import DarkModeToggle from './ToggleSwitch';
 import { formatPokemonData } from '../const.js';
 import { ThemeContext } from './ThemeContext.jsx';
 import logo from '../assets/logo Pokedex.png';
+import PokemonDetails from './PokemonDetail.jsx';
 
 function SearchSection({
   isDarkMode,
@@ -63,7 +64,7 @@ function SearchSection({
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ onSearchResult }) { 
   const { isDarkMode } = useContext(ThemeContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,6 +72,7 @@ export default function Navbar() {
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [pokemonCache, setPokemonCache] = useState({});
   const [loading, setLoading] = useState(false);
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
 
   useEffect(() => {
     const fetchPokemonList = async () => {
@@ -93,24 +95,28 @@ export default function Navbar() {
     setFilteredSuggestions(filtered.slice(0, 5));
   };
 
-  const handleSearch = async () => {
-    const term = searchTerm.toLowerCase();
-    if (!term) return;
+  const handleSearch = async (termToSearch = searchTerm.trim().toLowerCase()) => {
+    if (!termToSearch) return;
     setFilteredSuggestions([]);
     setLoading(true);
     try {
-      if (pokemonCache[term]) {
-        console.log(pokemonCache[term]);
+      console.log('Fetching with term:', termToSearch);
+      if (pokemonCache[termToSearch]) {
+        console.log('Cache hit:', pokemonCache[termToSearch]);
+        setSelectedPokemon(pokemonCache[termToSearch]);
+        if (onSearchResult) onSearchResult(pokemonCache[termToSearch]);
       } else {
-        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${term}`);
-        if (!res.ok) throw new Error('Pokémon non trouvé');
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(termToSearch)}`);
+        if (!res.ok) throw new Error(`Pokémon non trouvé: ${res.status}`);
         const rawData = await res.json();
         const pokemon = await formatPokemonData(rawData);
-        setPokemonCache((prev) => ({ ...prev, [term]: pokemon }));
-        console.log(pokemon);
+        setPokemonCache((prev) => ({ ...prev, [termToSearch]: pokemon }));
+        console.log('Fetched pokemon:', pokemon);
+        setSelectedPokemon(pokemon); 
+        if (onSearchResult) onSearchResult(pokemon);
       }
     } catch (err) {
-      console.error('Erreur :', err);
+      console.error('Erreur lors de la recherche:', err.message, 'for term:', termToSearch);
     } finally {
       setLoading(false);
     }
@@ -121,10 +127,15 @@ export default function Navbar() {
   };
 
   const handleSuggestionClick = (suggestion) => {
+    console.log('Suggestion clicked:', suggestion);
     setSearchTerm(suggestion);
     setFilteredSuggestions([]);
     setIsMenuOpen(false);
-    handleSearch();
+    handleSearch(suggestion);
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedPokemon(null); // Fermer les détails
   };
 
   return (
@@ -207,6 +218,18 @@ export default function Navbar() {
         <div
           onClick={() => setIsMenuOpen(false)}
           className="fixed inset-0 bg-black bg-opacity-40 z-40"
+        />
+      )}
+
+      {/* Affichage de PokemonDetails dans Navbar */}
+      {selectedPokemon && (
+        <PokemonDetails
+          pokemon={selectedPokemon}
+          onClose={handleCloseDetails}
+          onShowPokemon={(evo) => {
+            const matchingPokemon = pokemonCache[evo.name] || null;
+            if (matchingPokemon) setSelectedPokemon(matchingPokemon);
+          }}
         />
       )}
     </>

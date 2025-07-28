@@ -1,14 +1,13 @@
-// src/components/Card.jsx
 import { pokemonTypeConfig, typeIcons } from '../const.js';
 import {
   Circle, Flame, Droplet, Zap, Leaf, Snowflake,
   Crosshair, Skull, Globe, Wind, Brain, Bug,
-  Mountain, Ghost, Moon, Shield, Heart
+  Mountain, Ghost, Moon, Shield, Heart, Star
 } from 'lucide-react';
 import { useContext } from 'react';
 import { ThemeContext } from './ThemeContext';
 
-export default function Card({ img, id, name, types, weight, height, onClick }) {
+export default function Card({ img, id, name, types, weight, height, isLegendary, isMythical, isBaby, onClick }) {
   const { isDarkMode } = useContext(ThemeContext);
   const primaryType = types?.[0] || 'normal';
   const borderClass = pokemonTypeConfig[primaryType]?.border || 'border-gray-400';
@@ -36,17 +35,88 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
   };
   const glowColor = glowColorHexMap[bgClass] || (isDarkMode ? '#888' : '#aaa');
 
+  // Determine special status (priority: legendary > mythical > baby)
+  const specialStatus = isLegendary ? 'LEGENDARY' : isMythical ? 'MYTHICAL' : isBaby ? 'BABY' : null;
+
   return (
     <div
       className={`
         relative shadow-lg border-2 ${borderClass} rounded-2xl p-3 cursor-pointer transition-all duration-300 min-w-[180px] max-w-[240px] hover:scale-105
-        ${isDarkMode ? 'bg-black' : 'bg-white'}
+        ${isDarkMode ? 'bg-black' : 'bg-white'} overflow-hidden
       `}
       onClick={onClick}
       style={{
         boxShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}25`
       }}
     >
+      {/* Watermark Background with Stars for Special Status */}
+      {specialStatus && (
+        <div
+          className={`
+            absolute inset-0 flex items-center justify-center pointer-events-none
+            ${isDarkMode ? 'text-yellow-700' : 'text-yellow-500'}
+          `}
+          style={{
+            zIndex: 0
+          }}
+        >
+          {/* Watermark Text */}
+          <div
+            style={{
+              fontSize: '3rem',
+              fontWeight: 'bold',
+              opacity: 0.2,
+              transform: 'rotate(-45deg)',
+              whiteSpace: 'nowrap',
+              textTransform: 'uppercase'
+            }}
+          >
+            {specialStatus}
+          </div>
+          {/* Decorative Stars */}
+          <Star
+            className="absolute w-6 h-6"
+            style={{
+              top: '10%',
+              left: '10%',
+              opacity: 0.3,
+              transform: 'rotate(15deg)',
+              color: 'text-yellow-700'
+            }}
+          />
+          <Star
+            className="absolute w-5 h-5"
+            style={{
+              top: '20%',
+              right: '15%',
+              opacity: 0.25,
+              transform: 'rotate(-20deg)',
+              color: 'text-yellow-700'
+            }}
+          />
+          <Star
+            className="absolute w-4 h-4"
+            style={{
+              bottom: '15%',
+              left: '20%',
+              opacity: 0.2,
+              transform: 'rotate(30deg)',
+              color: 'text-yellow-700'
+            }}
+          />
+          <Star
+            className="absolute w-5 h-5"
+            style={{
+              bottom: '10%',
+              right: '10%',
+              opacity: 0.25,
+              transform: 'rotate(-10deg)',
+              color: 'text-yellow-700'
+            }}
+          />
+        </div>
+      )}
+
       {/* ID permanent */}
       <div
         className={`
@@ -58,7 +128,7 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
       </div>
 
       {/* Glow derrière l’image */}
-      <div className="w-full flex items-center justify-center py-4">
+      <div className="w-full flex items-center justify-center py-4 relative z-10">
         <div
           className="rounded-full p-2"
           style={{
@@ -76,7 +146,7 @@ export default function Card({ img, id, name, types, weight, height, onClick }) 
       </div>
 
       {/* Contenu texte */}
-      <div className="text-center">
+      <div className="text-center relative z-10">
         <p
           className={`
             text-lg font-bold mt-2 capitalize truncate
