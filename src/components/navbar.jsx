@@ -18,12 +18,11 @@ function SearchSection({
   loading = false,
 }) {
   return (
-    <div className="flex flex-col gap-4 relative w-full">
+    <div className="flex flex-col gap-2 w-full relative">
       <input
-        className={`
-          rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-400
-          ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-900'}
-        `}
+        className={`rounded-lg px-4 py-2 w-full border focus:outline-none focus:ring-2 focus:ring-blue-400 transition ${
+          isDarkMode ? 'bg-slate-900 text-white border-slate-700' : 'bg-gray-100 text-gray-900 border-gray-300'
+        }`}
         type="text"
         placeholder="name or number"
         value={searchTerm}
@@ -32,39 +31,26 @@ function SearchSection({
       />
       {suggestions.length > 0 && (
         <div
-          className={`
-            absolute top-full left-0 w-full mt-1 rounded-xl shadow-lg overflow-hidden z-50
-            ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-900'}
-            border border-gray-200 dark:border-gray-700
-          `}
+          className={`absolute top-full mt-1 w-full rounded-md shadow-md z-50 overflow-hidden ${
+            isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-gray-900'
+          } border ${isDarkMode ? 'border-slate-700' : 'border-gray-200'}`}
         >
           {suggestions.map((suggestion, index) => (
             <div
               key={index}
               onClick={() => onSuggestionClick(suggestion)}
-              className={`
-                px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700
-                ${index === suggestions.length - 1 ? '' : 'border-b border-gray-200 dark:border-gray-700'}
-              `}
+              className="px-4 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-slate-700"
             >
               {suggestion.charAt(0).toUpperCase() + suggestion.slice(1)}
             </div>
           ))}
         </div>
       )}
-      <div className="flex gap-4">
-        <Search
-          size={24}
-          className={`cursor-pointer ${isDarkMode ? 'text-white' : 'text-gray-900'} ${loading ? 'animate-spin' : ''}`}
-          onClick={onSearch}
-        />
-        {showSettings && <Settings2 size={24} className={isDarkMode ? 'text-white' : 'text-gray-900'} />}
-      </div>
     </div>
   );
 }
 
-export default function Navbar({ onSearchResult }) { 
+export default function Navbar({ onSearchResult }) {
   const { isDarkMode } = useContext(ThemeContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -100,23 +86,20 @@ export default function Navbar({ onSearchResult }) {
     setFilteredSuggestions([]);
     setLoading(true);
     try {
-      console.log('Fetching with term:', termToSearch);
       if (pokemonCache[termToSearch]) {
-        console.log('Cache hit:', pokemonCache[termToSearch]);
         setSelectedPokemon(pokemonCache[termToSearch]);
-        if (onSearchResult) onSearchResult(pokemonCache[termToSearch]);
+        onSearchResult?.(pokemonCache[termToSearch]);
       } else {
         const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(termToSearch)}`);
-        if (!res.ok) throw new Error(`Pokémon non trouvé: ${res.status}`);
+        if (!res.ok) throw new Error('Pokémon not found');
         const rawData = await res.json();
         const pokemon = await formatPokemonData(rawData);
         setPokemonCache((prev) => ({ ...prev, [termToSearch]: pokemon }));
-        console.log('Fetched pokemon:', pokemon);
-        setSelectedPokemon(pokemon); 
-        if (onSearchResult) onSearchResult(pokemon);
+        setSelectedPokemon(pokemon);
+        onSearchResult?.(pokemon);
       }
     } catch (err) {
-      console.error('Erreur lors de la recherche:', err.message, 'for term:', termToSearch);
+      console.error('Erreur de recherche :', err);
     } finally {
       setLoading(false);
     }
@@ -127,77 +110,61 @@ export default function Navbar({ onSearchResult }) {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    console.log('Suggestion clicked:', suggestion);
     setSearchTerm(suggestion);
     setFilteredSuggestions([]);
     setIsMenuOpen(false);
     handleSearch(suggestion);
   };
 
-  const handleCloseDetails = () => {
-    setSelectedPokemon(null); // Fermer les détails
-  };
-
   return (
     <>
-      <nav
-        className={`
-          sticky top-0 z-50 px-4 py-4 md:px-16 flex items-center justify-between
-          ${isDarkMode ? 'bg-[#0a0a23] text-white' : 'bg-white text-gray-900'}
-        `}
-      >
-        <div className="flex items-center justify-between w-full md:w-auto">
-          <img src={logo} className="h-16" alt="Pokedex Logo" />
+      <nav className={`sticky top-0 z-50 flex items-center justify-between px-4 py-3 md:px-16 ${
+        isDarkMode ? 'bg-[#0a0a23] text-white' : 'bg-white text-gray-900'
+      }`}>
+        <div className="flex items-center gap-4">
+          <img src={logo} className="h-14" alt="Pokedex Logo" />
+          <div className="hidden md:flex items-center gap-4 w-[400px]">
+            <SearchSection
+              isDarkMode={isDarkMode}
+              searchTerm={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                updateSuggestions(e.target.value);
+              }}
+              onKeyDown={handleKeyDown}
+              onSearch={handleSearch}
+              suggestions={filteredSuggestions}
+              onSuggestionClick={handleSuggestionClick}
+              loading={loading}
+            />
+            <Search
+              size={24}
+              className={`cursor-pointer ${isDarkMode ? 'text-white' : 'text-gray-900'} ${loading ? 'animate-spin' : ''}`}
+              onClick={handleSearch}
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-4 items-center">
+          <DarkModeToggle />
           <button onClick={() => setIsMenuOpen(true)} className="md:hidden">
             <Menu size={28} />
           </button>
         </div>
-
-        <div className="hidden md:flex gap-5 items-center relative w-[300px]">
-          <DarkModeToggle />
-          <SearchSection
-            isDarkMode={isDarkMode}
-            searchTerm={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              updateSuggestions(e.target.value);
-            }}
-            onKeyDown={handleKeyDown}
-            onSearch={handleSearch}
-            suggestions={filteredSuggestions}
-            onSuggestionClick={handleSuggestionClick}
-            loading={loading}
-          />
-        </div>
       </nav>
 
       <aside
-        className={`
-          fixed top-0 left-0 h-full w-72 shadow-xl z-50 transform transition-transform duration-300 ease-in-out
-          ${isDarkMode ? 'bg-gradient-to-b from-[#003366] to-[#001933] text-white' : 'bg-gradient-to-b from-blue-100 to-blue-50 text-gray-900'}
-          ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
+        className={`fixed top-0 left-0 h-full w-72 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+          isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-gray-900'
+        } ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div
-          className={`
-            flex justify-between items-center p-6
-            ${isDarkMode ? 'border-b border-blue-700' : 'border-b border-blue-200'}
-          `}
-        >
-          <h2 className="text-2xl font-semibold">Menu</h2>
-          <button
-            onClick={() => setIsMenuOpen(false)}
-            className={`
-              p-2 rounded-md
-              ${isDarkMode ? 'hover:bg-blue-700' : 'hover:bg-blue-200'}
-            `}
-          >
+        <div className="flex justify-between items-center p-4 border-b border-gray-700">
+          <h2 className="text-xl font-semibold">Menu</h2>
+          <button onClick={() => setIsMenuOpen(false)}>
             <X size={28} />
           </button>
         </div>
-
-        <div className="flex flex-col p-6 gap-6 relative">
-          <DarkModeToggle />
+        <div className="p-4 flex flex-col gap-4">
           <SearchSection
             isDarkMode={isDarkMode}
             searchTerm={searchTerm}
@@ -221,14 +188,14 @@ export default function Navbar({ onSearchResult }) {
         />
       )}
 
-      {/* Affichage de PokemonDetails dans Navbar */}
       {selectedPokemon && (
         <PokemonDetails
           pokemon={selectedPokemon}
-          onClose={handleCloseDetails}
+          onClose={() => setSelectedPokemon(null)}
           onShowPokemon={(evo) => {
-            const matchingPokemon = pokemonCache[evo.name] || null;
-            if (matchingPokemon) setSelectedPokemon(matchingPokemon);
+            if (pokemonCache[evo.name]) {
+              setSelectedPokemon(pokemonCache[evo.name]);
+            }
           }}
         />
       )}
