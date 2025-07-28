@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, Circle, Flame, Droplet, Zap, Leaf, Snowflake, Crosshair, Skull, Globe, Wind, Brain, Bug, Mountain, Ghost, Moon, Shield, Heart, Star } from 'lucide-react';
 import { pokemonTypeConfig, typeIcons } from '../const.js';
 import { useContext, useState } from 'react';
 import { ThemeContext } from './ThemeContext';
@@ -9,7 +9,7 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
   const [activeTab, setActiveTab] = useState('text');
   if (!pokemon) return null;
 
-  const { id, name, img, height, weight, abilities, types, evolutions, stats, text } = pokemon;
+  const { id, name, img, height, weight, abilities, types, evolutions, stats, text, isLegendary, isMythical, isBaby } = pokemon;
   const primaryType = types?.[0] || 'normal';
   const bgClass = pokemonTypeConfig[primaryType]?.color || 'bg-gray-400';
   const borderClass = pokemonTypeConfig[primaryType]?.border || 'border-gray-400';
@@ -37,6 +37,9 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
   const glowColor = glowColorHexMap[bgClass] || (isDarkMode ? '#888' : '#aaa');
   const textColor = isDarkMode ? 'text-white' : 'text-gray-900';
   const subText = isDarkMode ? 'text-white/70' : 'text-gray-600';
+
+  // Determine special status (priority: legendary > mythical > baby)
+  const specialStatus = isLegendary ? 'Legendary' : isMythical ? 'Mythical' : isBaby ? 'Baby' : null;
 
   const tabContent = {
     stats: stats?.length > 0 ? (
@@ -84,7 +87,6 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         {text || 'No description available.'}
-        
       </motion.div>
     ),
     evolutions: evolutions?.length > 0 ? (
@@ -175,19 +177,30 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
                 className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
               />
             </div>
-            <h2
-              className={`
-                text-xl sm:text-2xl md:text-3xl font-bold capitalize mt-4 mb-2 text-center ${textColor}
-              `}
-            >
-              {name}
-            </h2>
-            <p className={`text-sm sm:text-base mb-4 ${subText}`}>
-              #{id.toString().padStart(4, '0')}
-            </p>
+            <div className="flex items-center justify-center gap-2 mt-4 mb-2">
+              <h2
+                className={`
+                  text-xl sm:text-2xl md:text-3xl font-bold capitalize ${textColor}
+                `}
+              >
+                {name} #{id.toString().padStart(4, '0')}
+              </h2>
+              {/* Special Status Badge */}
+              {specialStatus && (
+                <div
+                  className={`
+                    flex items-center gap-1 px-3 py-1 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-600 shadow-md
+                  `}
+                  style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)' }}
+                >
+                  <Star className="w-4 h-4 text-white" />
+                  <span className="text-white text-xs capitalize">{specialStatus}</span>
+                </div>
+              )}
+            </div>
             <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               {types?.map((type) => {
-                const Icon = typeIcons[type] || X;
+                const Icon = typeIcons[type] || Circle;
                 return (
                   <div
                     key={type}
@@ -204,7 +217,6 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
               })}
             </div>
           </div>
-
           <div className="w-full md:w-1/2 flex flex-col">
             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div>
