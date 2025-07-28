@@ -4,6 +4,11 @@ import { useContext, useState } from 'react';
 import { ThemeContext } from './ThemeContext';
 import { AnimatePresence, motion } from 'framer-motion';
 
+function getCryUrl(name) {
+  return `https://play.pokemonshowdown.com/audio/cries/${name.toLowerCase()}.mp3`;
+}
+
+
 export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
   const { isDarkMode } = useContext(ThemeContext);
   const [activeTab, setActiveTab] = useState('text');
@@ -232,6 +237,35 @@ export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
                 </p>
               </div>
             </div>
+
+            <button
+            onClick={() => {
+              const cryUrl = getCryUrl(pokemon.name);
+              const audio = new Audio(cryUrl);
+              audio.play().catch(() => {
+                alert("Désolé, pas de son disponible pour ce Pokémon.");
+              });
+            }}
+            className={`
+              flex items-center justify-center
+              w-8 h-8
+              text-sm
+              bg-gradient-to-br from-purple-500 to-purple-700
+              hover:from-purple-600 hover:to-purple-800
+              text-white
+              rounded-full
+              shadow-md
+              hover:shadow-lg
+              transition-all duration-200
+              focus:outline-none focus:ring-2 focus:ring-purple-400
+              ${isDarkMode ? 'border border-purple-600' : 'border border-purple-300'}
+              ${isDarkMode ? 'hover:border-purple-500' : 'hover:border-purple-400'}
+            `}
+            title="Jouer le cri du Pokémon"
+          >
+            🔊
+          </button>
+
 
             <div className="mb-4 sm:mb-6">
               <h3 className={`text-base sm:text-lg font-semibold mb-2 ${textColor}`}>
