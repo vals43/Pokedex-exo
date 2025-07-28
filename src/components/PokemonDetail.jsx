@@ -1,19 +1,22 @@
-// src/components/PokemonDetail.jsx
 import { X } from 'lucide-react';
 import { pokemonTypeConfig, typeIcons } from '../const.js';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { ThemeContext } from './ThemeContext';
+import { AnimatePresence, motion } from 'framer-motion';
 
-export default function PokemonDetails({ pokemon, onClose }) {
+export default function PokemonDetails({ pokemon, onClose, onShowPokemon }) {
   const { isDarkMode } = useContext(ThemeContext);
+  const [activeTab, setActiveTab] = useState('text');
   if (!pokemon) return null;
 
-  const { id, name, img, height, weight, abilities, types, evolutions, stats } = pokemon;
+  const { id, name, img, height, weight, abilities, types, evolutions, stats, text } = pokemon;
   const primaryType = types?.[0] || 'normal';
-  const bgClass = pokemonTypeConfig[primaryType]?.color || 'bg-gray-500';
-  const gradientClass = pokemonTypeConfig[primaryType]?.gradient || 'from-gray-500 to-gray-700';
+  const bgClass = pokemonTypeConfig[primaryType]?.color || 'bg-gray-400';
+  const borderClass = pokemonTypeConfig[primaryType]?.border || 'border-gray-400';
 
-  const glowColorHex = {
+  // Consistent glowColorHexMap with Card.jsx
+  const glowColorHexMap = {
+    'bg-gray-400': isDarkMode ? '#9ca3af' : '#6b7280',
     'bg-red-500': '#ef4444',
     'bg-blue-500': '#3b82f6',
     'bg-yellow-400': '#facc15',
@@ -30,96 +33,154 @@ export default function PokemonDetails({ pokemon, onClose }) {
     'bg-violet-600': '#7c3aed',
     'bg-gray-800': isDarkMode ? '#1f2937' : '#d1d5db',
     'bg-gray-500': isDarkMode ? '#6b7280' : '#9ca3af',
-    'bg-pink-300': '#f9a8d4'
-  }[bgClass] || (isDarkMode ? '#888' : '#aaa');
+    'bg-pink-300': '#f9a8d4',
+  };
+  const glowColor = glowColorHexMap[bgClass] || (isDarkMode ? '#888' : '#aaa');
+  const textColor = isDarkMode ? 'text-white' : 'text-gray-900';
+  const subText = isDarkMode ? 'text-white/70' : 'text-gray-600';
+
+  const tabContent = {
+    stats: stats && (
+      <motion.div
+        className="space-y-2 sm:space-y-3"
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -100, opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      >
+        {stats.map((stat, i) => (
+          <div key={i} className="flex items-center gap-2 sm:gap-3">
+            <span className={`w-20 sm:w-24 text-xs text-white  sm:text-sm capitalize ${subText}`}>
+              {stat.name}
+            </span>
+            <div className="flex-1 h-2 sm:h-3 text-white bg-gray-300 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${bgClass}`}
+                style={{ width: `${(stat.base_stat / 255) * 100}%` }}
+              />
+            </div>
+            <span className={`text-xs text-white sm:text-sm ${subText}`}>
+              {stat.base_stat}
+            </span>
+          </div>
+        ))}
+      </motion.div>
+    ),
+    description: (
+      <motion.div
+        className="text-sm sm:text-base leading-relaxed whitespace-pre-line"
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -100, opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      >
+        {text || 'No description available.'}
+      </motion.div>
+    ),
+    evolutions: evolutions?.length > 0 && (
+      <motion.div
+        className="flex gap-3 sm:gap-4 overflow-x-auto pb-2"
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -100, opacity: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      >
+        {evolutions.map((evo, i) => (
+          <div key={i} className="flex flex-col items-center text-center min-w-[80px]">
+            <div
+              className={`
+                w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center
+                ${isDarkMode ? 'bg-black/70' : 'bg-gray-200/70'} cursor-pointer
+              `}
+              onClick={() => onShowPokemon && onShowPokemon(evo)}
+            >
+              <img
+                src={evo.img || 'https://via.placeholder.com/64?text=?'}
+                alt={`Image of ${evo.name}`}
+                className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+              />
+            </div>
+            <span className={`mt-1 sm:mt-2 text-xs sm:text-sm capitalize ${subText}`}>
+              {evo.name}
+            </span>
+          </div>
+        ))}
+      </motion.div>
+    ),
+  };
 
   return (
     <div
       className={`
-        fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8
+        fixed inset-0 z-50 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8
         ${isDarkMode ? 'bg-black/80' : 'bg-gray-200/80'} backdrop-blur-sm
       `}
     >
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.3 }}
         className={`
-          relative rounded-3xl p-6 md:p-8 lg:p-10 w-full max-w-md md:max-w-lg lg:max-w-4xl
-          shadow-2xl border-4 ${pokemonTypeConfig[primaryType]?.border || 'border-gray-400'}
-          ${isDarkMode ? `bg-gradient-to-b ${gradientClass}` : 'bg-white'}
+          relative w-full max-w-[90vw] sm:max-w-lg md:max-w-2xl lg:max-w-4xl rounded-2xl p-4 sm:p-6 md:p-8
+          border-2 ${borderClass} ${isDarkMode ? 'bg-black' : 'bg-white'}
+          shadow-lg
         `}
-        style={{
-          boxShadow: `0 0 30px ${glowColorHex}66, 0 0 50px ${glowColorHex}33`
-        }}
+        style={{ boxShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}25` }}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
           className={`
-            absolute top-4 right-4 p-2 rounded-full
-            ${isDarkMode ? 'bg-white/20 hover:bg-white/30' : 'bg-gray-200/50 hover:bg-gray-300/50'}
-            transition-colors duration-200
+            absolute top-3 right-3 p-2 rounded-full
+            ${isDarkMode ? 'bg-black/70 hover:bg-black/80 text-white' : 'bg-gray-200/70 hover:bg-gray-300/50 text-gray-900'}
+            transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${primaryType}-500
           `}
+          aria-label="Close Pokémon Details"
         >
-          <X className={isDarkMode ? 'text-white' : 'text-gray-900'} size={24} />
+          <X size={20} />
         </button>
 
-        {/* Main Content: Single-column on mobile, Two-column on desktop */}
-        <div
-          className={`
-            lg:grid lg:grid-cols-2 lg:gap-8
-          `}
-        >
+        {/* Main Content */}
+        <div className="flex flex-col md:flex-row md:gap-6">
           {/* Left Section: Image, Name, ID, Types */}
-          <div className="flex flex-col items-center">
-            {/* Pokémon Image */}
-            <div className="flex justify-center mb-6 md:mb-8">
-              <div
-                className="rounded-full p-4 md:p-6"
-                style={{
-                  backgroundColor: `${glowColorHex}22`,
-                  boxShadow: `0 0 30px ${glowColorHex}88`,
-                  borderRadius: '50%'
-                }}
-              >
-                <img
-                  src={img}
-                  alt={name}
-                  className="w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 object-contain"
-                />
-              </div>
+          <div className="flex flex-col items-center w-full md:w-1/2">
+            <div
+              className="p-3 sm:p-4 rounded-full"
+              style={{
+                backgroundColor: `${glowColor}22`,
+                boxShadow: `0 0 20px ${glowColor}`,
+              }}
+            >
+              <img
+                src={img}
+                alt={`Image of ${name}`}
+                className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
+              />
             </div>
-
-            {/* Pokémon Info */}
             <h2
               className={`
-                text-2xl md:text-3xl lg:text-4xl font-bold capitalize mb-2 text-center
-                ${isDarkMode ? 'text-white' : 'text-gray-900'}
+                text-xl sm:text-2xl md:text-3xl font-bold capitalize mt-4 mb-2 text-center ${textColor}
               `}
             >
               {name}
             </h2>
-            <p
-              className={`
-                text-sm md:text-base mb-4 text-center
-                ${isDarkMode ? 'text-white/70' : 'text-gray-600'}
-              `}
-            >
+            <p className={`text-sm sm:text-base mb-4 ${subText}`}>
               #{id.toString().padStart(4, '0')}
             </p>
-
-            {/* Types */}
-            <div className="flex justify-center gap-3 mb-6 flex-wrap">
-              {types?.map(type => {
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              {types?.map((type) => {
                 const Icon = typeIcons[type] || X;
                 return (
                   <div
                     key={type}
                     className={`
-                      flex items-center gap-2 px-4 py-2 rounded-full text-sm md:text-base font-medium
-                      ${pokemonTypeConfig[type]?.color || 'bg-gray-500'}
-                      shadow-md
+                      flex items-center gap-1 px-3 py-1 rounded-lg text-sm sm:text-base font-medium
+                      ${pokemonTypeConfig[type]?.color || 'bg-gray-400'} shadow-md
                     `}
+                    style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)' }}
                   >
-                    <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     <span className="capitalize text-white">{type}</span>
                   </div>
                 );
@@ -127,56 +188,27 @@ export default function PokemonDetails({ pokemon, onClose }) {
             </div>
           </div>
 
-          {/* Right Section: Height, Weight, Abilities, Stats, Evolutions */}
-          <div className="flex flex-col">
+          {/* Right Section: Details */}
+          <div className="w-full md:w-1/2 flex flex-col">
             {/* Basic Info */}
-            <div className="grid grid-cols-2 gap-4 md:gap-6 mb-6">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div>
-                <p
-                  className={`
-                    text-sm md:text-base font-semibold
-                    ${isDarkMode ? 'text-white/80' : 'text-gray-700'}
-                  `}
-                >
-                  Height
-                </p>
-                <p
-                  className={`
-                    text-base md:text-lg
-                    ${isDarkMode ? 'text-white' : 'text-gray-900'}
-                  `}
-                >
+                <p className={`text-sm font-semibold ${subText}`}>Height</p>
+                <p className={`text-sm sm:text-base ${textColor}`}>
                   {(height / 10).toFixed(1)} m
                 </p>
               </div>
               <div>
-                <p
-                  className={`
-                    text-sm md:text-base font-semibold
-                    ${isDarkMode ? 'text-white/80' : 'text-gray-700'}
-                  `}
-                >
-                  Weight
-                </p>
-                <p
-                  className={`
-                    text-base md:text-lg
-                    ${isDarkMode ? 'text-white' : 'text-gray-900'}
-                  `}
-                >
+                <p className={`text-sm font-semibold ${subText}`}>Weight</p>
+                <p className={`text-sm sm:text-base ${textColor}`}>
                   {(weight / 10).toFixed(1)} kg
                 </p>
               </div>
             </div>
 
             {/* Abilities */}
-            <div className="mb-6">
-              <h3
-                className={`
-                  text-lg md:text-xl font-semibold mb-2
-                  ${isDarkMode ? 'text-white' : 'text-gray-900'}
-                `}
-              >
+            <div className="mb-4 sm:mb-6">
+              <h3 className={`text-base sm:text-lg font-semibold mb-2 ${textColor}`}>
                 Abilities
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -184,8 +216,8 @@ export default function PokemonDetails({ pokemon, onClose }) {
                   <span
                     key={i}
                     className={`
-                      px-3 py-1 rounded-full text-sm md:text-base capitalize
-                      ${isDarkMode ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-900'}
+                      px-2 sm:px-3 py-1 rounded-lg text-sm capitalize
+                      ${isDarkMode ? 'bg-black/70 text-white' : 'bg-gray-200/70 text-gray-900'}
                     `}
                   >
                     {ability}
@@ -194,99 +226,45 @@ export default function PokemonDetails({ pokemon, onClose }) {
               </div>
             </div>
 
-            {/* Stats (Optional, if available in data) */}
-            {stats && (
-              <div className="mb-6">
-                <h3
-                  className={`
-                    text-lg md:text-xl font-semibold mb-2
-                    ${isDarkMode ? 'text-white' : 'text-gray-900'}
-                  `}
-                >
-                  Stats
-                </h3>
-                <div className="space-y-3 md:space-y-4">
-                  {stats.map((stat, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <span
-                        className={`
-                          w-24 text-sm md:text-base capitalize
-                          ${isDarkMode ? 'text-white/80' : 'text-gray-700'}
-                        `}
-                      >
-                        {stat.name}
-                      </span>
-                      <div className="flex-1 h-2 md:h-3 bg-gray-300 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${bgClass}`}
-                          style={{ width: `${(stat.base_stat / 255) * 100}%` }}
-                        />
-                      </div>
-                      <span
-                        className={`
-                          text-sm md:text-base
-                          ${isDarkMode ? 'text-white' : 'text-gray-900'}
-                        `}
-                      >
-                        {stat.base_stat}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+            {/* Tabs */}
+            <div className="mb-4 sm:mb-6">
+              <div className="flex gap-2 sm:gap-3 border-b border-gray-300 dark:border-gray-600">
+                {['stats', 'description', 'evolutions'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`
+                      px-3 py-2 text-sm sm:text-base font-medium rounded-t-lg transition-colors
+                      ${activeTab === tab
+                        ? `${bgClass} text-white`
+                        : `${isDarkMode ? 'text-white/70' : 'text-gray-600'} hover:bg-gray-200 dark:hover:bg-gray-700`
+                      }
+                    `}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
               </div>
-            )}
-
-            {/* Evolutions */}
-            {evolutions?.length > 0 && (
-              <div>
-                <h3
-                  className={`
-                    text-lg md:text-xl font-semibold mb-2
-                    ${isDarkMode ? 'text-white' : 'text-gray-900'}
-                  `}
-                >
-                  Evolutions
-                </h3>
-                <div className="flex flex-wrap gap-4 md:gap-6">
-                  {evolutions.map((evo, i) => (
-                    <div key={i} className="flex flex-col items-center text-sm md:text-base capitalize">
-                      <div
-                        className={`
-                          w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full
-                          ${isDarkMode ? 'bg-white/10' : 'bg-gray-100'}
-                        `}
-                      >
-                        <img
-                          src={evo.img || 'https://via.placeholder.com/64?text=?'}
-                          alt={evo.name}
-                          className="object-contain w-12 h-12 md:w-16 md:h-16"
-                        />
-                      </div>
-                      <span
-                        className={`
-                          mt-2
-                          ${isDarkMode ? 'text-white/80' : 'text-gray-700'}
-                        `}
-                      >
-                        {evo.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+              <div className="mt-2">
+                <AnimatePresence mode="wait">
+                  {tabContent[activeTab] || (
+                    <motion.div
+                      key="empty"
+                      initial={{ x: 100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -100, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="text-sm sm:text-base text-center text-gray-500"
+                    >
+                      No content available.
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            )}
-            {/*description*/}
-            <div className={`
-                          mt-2
-                          ${isDarkMode ? 'text-white/80' : 'text-gray-700'}
-                        `}>
-              <h1>Description</h1>
-              <p>{pokemon.text}</p>
-
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
