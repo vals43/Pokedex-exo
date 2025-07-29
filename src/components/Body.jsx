@@ -23,11 +23,13 @@ export default function Body() {
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [currentGenId, setCurrentGenId] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
+        setError(null);
         const maxId = generations[generations.length - 1].max;
         const [data, evolutions, specialStatuses] = await Promise.all([
           getPokemonData(maxId),
@@ -37,7 +39,7 @@ export default function Body() {
 
         const combinedData = data.map((pokemon, index) => ({
           ...pokemon,
-          evolutions: evolutions[index]?.evolutions || [],
+          evolutions: evolutions.find(evo => evo.id === pokemon.id)?.evolutions || [],
           isLegendary: specialStatuses[index]?.isLegendary || false,
           isMythical: specialStatuses[index]?.isMythical || false,
           isBaby: specialStatuses[index]?.isBaby || false,
@@ -47,6 +49,7 @@ export default function Body() {
         setPokemonData(combinedData);
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error.message);
+        setError('Failed to load Pokémon data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -70,6 +73,11 @@ export default function Body() {
 
   return (
     <div className={`min-h-screen p-8 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
+      {error && (
+        <div className="text-red-500 text-center mb-4">
+          {error}
+        </div>
+      )}
       {/* Boutons de génération */}
       <div className="flex flex-wrap justify-center gap-3 mb-6">
         {generations.map((gen) => (
@@ -80,12 +88,17 @@ export default function Body() {
               setSelectedPokemon(null);
             }}
             className={`
-              px-4 py-2 rounded-lg border
+              px-4 py-2
+              rounded-lg
+              border
+              text-sm font-medium
+              transition-all duration-200
               ${currentGenId === gen.id
-                ? 'bg-blue-600 text-white font-bold'
+                ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg ring-2 ring-blue-400 ring-opacity-50'
                 : isDarkMode
-                ? 'bg-gray-800 text-gray-300 hover:bg-blue-700'
-                : 'bg-white text-gray-700 hover:bg-blue-100'}
+                ? 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white hover:shadow-md hover:ring-1 hover:ring-blue-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-gray-900 hover:shadow-md hover:ring-1 hover:ring-blue-300'}
+              focus:outline-none focus:ring-2 focus:ring-blue-400
             `}
           >
             {gen.label}

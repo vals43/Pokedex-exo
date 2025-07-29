@@ -1,15 +1,16 @@
-const POKEAPI_BASE = "https://pokeapi.co/api/v2";
 import {
   Circle, Flame, Droplet, Zap, Leaf, Snowflake,
   Crosshair, Skull, Globe, Wind, Brain, Bug,
   Mountain, Ghost, Moon, Shield, Heart
 } from 'lucide-react';
 
+const POKEAPI_BASE = "https://pokeapi.co/api/v2";
+
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function getPokemonId(maxId = 5000) {
+export async function getPokemonId(maxId = 1010) {
   try {
     const response = await fetch(`${POKEAPI_BASE}/pokemon?limit=${maxId}`);
     if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
@@ -20,7 +21,7 @@ export async function getPokemonId(maxId = 5000) {
   }
 }
 
-export async function getPokemonStats(maxId = 5000) {
+export async function getPokemonStats(maxId = 1010) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const results = [];
@@ -59,7 +60,7 @@ export async function getPokemonStats(maxId = 5000) {
   }
 }
 
-export async function getPokemonData(maxId = 5000) {
+export async function getPokemonData(maxId = 1010) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const statsData = await getPokemonStats(maxId);
@@ -124,12 +125,18 @@ async function getEvolutionChain(url, cache = new Map()) {
     const data = await res.json();
 
     const evolutions = [];
-    function extract(chain) {
-      evolutions.push(chain.species.name);
-      chain.evolves_to.forEach(extract);
+    async function extract(chain) {
+      const speciesResponse = await fetch(`${POKEAPI_BASE}/pokemon-species/${chain.species.name}`);
+      const speciesData = speciesResponse.ok ? await speciesResponse.json() : {};
+      const defaultVariety = speciesData.varieties?.find(v => v.is_default) || speciesData.varieties?.[0];
+      const pokemonName = defaultVariety?.pokemon?.name || chain.species.name;
+      evolutions.push(pokemonName);
+      for (const evo of chain.evolves_to) {
+        await extract(evo);
+      }
     }
 
-    extract(data.chain);
+    await extract(data.chain);
     cache.set(url, evolutions);
     return evolutions;
   } catch (error) {
@@ -138,7 +145,7 @@ async function getEvolutionChain(url, cache = new Map()) {
   }
 }
 
-export async function getPokemonEvolutions(maxId = 5000) {
+export async function getPokemonEvolutions(maxId = 1010) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const results = [];
@@ -165,20 +172,26 @@ export async function getPokemonEvolutions(maxId = 5000) {
             const evolutionsWithImages = await Promise.all(
               names.map(async name => {
                 if (imageCache.has(name)) return imageCache.get(name);
-                const pokeRes = await fetch(`${POKEAPI_BASE}/pokemon/${name}`);
-                if (!pokeRes.ok) return { name, img: null };
-                const pokeData = await pokeRes.json();
-                const evoObj = {
-                  name,
-                  img: pokeData.sprites.other['official-artwork'].front_default
-                };
-                imageCache.set(name, evoObj);
-                return evoObj;
+                try {
+                  const pokeRes = await fetch(`${POKEAPI_BASE}/pokemon/${name}`);
+                  if (!pokeRes.ok) throw new Error(`Pokémon ${name} not found`);
+                  const pokeData = await pokeRes.json();
+                  const evoObj = {
+                    name,
+                    img: pokeData.sprites.other['official-artwork'].front_default
+                  };
+                  imageCache.set(name, evoObj);
+                  return evoObj;
+                } catch (error) {
+                  console.warn(`Erreur pour le Pokémon ${name}: ${error.message}`);
+                  return { name, img: null };
+                }
               })
             );
 
             return { id, evolutions: evolutionsWithImages };
           } catch (e) {
+            console.warn(`Erreur pour le Pokémon ${id}: ${e.message}`);
             return { id, evolutions: [], error: e.message };
           }
         })
@@ -257,7 +270,7 @@ export const typeIcons = {
   fairy: Heart
 };
 
-export async function getPokemonSpecialStatus(maxId = 5000) {
+export async function getPokemonSpecialStatus(maxId = 1010) {
   try {
     const pokemonIds = await getPokemonId(maxId);
     const results = [];
